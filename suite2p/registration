@@ -1,0 +1,42 @@
+%%Load file
+%
+close all; clear all; clc 
+Heat=load('Fall_40_vgatm2');
+Cool=load('Fall_10_vgatm2');
+load('CG_VGATM2_10_40_reg');
+
+
+
+%% combining iscell and F into one table
+TF1 = Cool.F; %1 is for which is in first column of the reg
+TCells1 = Cool.iscell;
+T1 = [ TCells1 TF1];
+T1Idx=find(T1(:,1)==1); %Gives the cell number that corresponds to the GUI but need to add (-1). The row numbers is what roireg uses to determine cell number
+
+
+TF2 = Heat.F; %2 is for which is in first column of the reg
+TCells2 = Heat.iscell;
+T2 = [ TCells2 TF2];
+T2Idx=find(T2(:,1)==1);
+
+%% deleting rows that are not cells
+Del = T1(:,1)== 0;
+T1(Del,:)=[];
+T1(:,[1,2])=[];
+
+Del = T2(:,1)== 0;
+T2(Del,:)=[];
+T2(:,[1,2])=[];
+
+%% Sorting for both files based on matched data
+A=[roiMatchData.allSessionMapping];
+T1Sorted=T1(A(:,1),:); %remember to assign position
+T1CellsGUI=T1Idx(A(:,1),:);
+
+A=[roiMatchData.allSessionMapping];
+T2Sorted=T2(A(:,2),:); %remember to assign position
+T2CellsGUI=T2Idx(A(:,2),:);
+
+
+%% save output tables
+save('VGATM2_10_40_reg_Processed', 'T2Idx', 'T2Sorted', 'T2CellsGUI','T1Idx', 'T1Sorted', 'T1CellsGUI');
