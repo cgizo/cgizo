@@ -1,0 +1,247 @@
+
+close all;clear all
+
+%ref (A) is 10c
+%reg (B) is 40c
+
+load('VGLUTDTRM1_10C_40C_28022022_reg')
+%seconds/minute*framerate*minutes
+% starttime=60*5*.21; %baseline starts here
+pretime=60*5*10; %baseline ends here
+% manip_start=60*5*11; %actual time injected
+inf_start=60*5*11; %time for manip to take effect
+inf_end=60*5*21; %end of manip. taking effect 
+new_end=60*5*25; %change to real end
+% new_end=new_end+(manip_start-pretime)+starttime;
+
+% starttime2=round(60*7.25*.25); %start time
+pretime2=60*5*10; %baseline ENDS
+inf_start2=60*11; %consider inf to be start of manipulation
+inf_end2=60*5*21; %change to real end
+new_end2=60*5*25; %change to real end
+
+
+C=T1Sorted(:, 1:new_end);
+C2=T2Sorted(:,1:new_end);
+% 
+% 
+ load('VGLUTM1_10_40_28022022_reg_Processed')
+C=[C;T1Sorted(:,1:new_end)];
+C2=[C2;T2Sorted(:,1:new_end)];
+
+% load('blabla2')
+% C=[C;mt_neurons.C_raw_A(:,1:new_end)];
+% C2=[C2;mt_neurons.C_raw_B(:,1:new_end)];
+
+%%%%%%%%%%%%%%%%%
+dff=[]; %average z-score change for each neuron
+dff2=[]; %average z-score change for each neuron
+
+for c=1:size(C,1)
+   C(c,:)=C(c,:)-mean(C(c,1:pretime));
+   C(c,:)=C(c,:)/std(C(c,1:pretime));
+   dff=[dff;mean(C(c,inf_start:inf_end))];
+   
+   C2(c,:)=C2(c,:)-mean(C2(c,1:pretime2));
+   C2(c,:)=C2(c,:)/std(C2(c,1:pretime2));
+   dff2=[dff2;mean(C2(c,inf_start2:inf_end2))];
+end
+
+C_old=C;
+C2_old=C2;
+[~, nind]=sort(dff);
+C=C(nind,:);
+C2=C2(nind,:);
+ 
+
+crind={};
+[cmap]=cbrewer('div', 'RdBu', 256); %need to get cbrewer function
+cmap=flip(cmap);
+figure
+time=(1:new_end)/60/5; %frames/seconds/frame rate
+h=heatmap_d(C,time,[],[],'MaxColorValue',5,'MinColorValue',-5,'Colormap',cmap,'Colorbar',1);
+xticks([1:25]*60*5) %60*frame rate 
+xticklabels([1:25]*60)
+yticks(1:size(C,1))
+yticklabels([1:size(C,1)])
+title('temp10')
+
+crind={};
+[cmap]=cbrewer('div', 'RdBu', 256); %need to get cbrewer function
+cmap=flip(cmap);
+figure
+time=(1:new_end2)/60/5; %frames/seconds/frame rate
+h=heatmap_d(C2,time,[],[],'MaxColorValue',5,'MinColorValue',-5,'Colormap',cmap,'Colorbar',1);
+xticks([1:25]*60*5) %60*frame rate 
+xticklabels([1:25]*60)
+yticks(1:size(C,1))
+yticklabels([1:size(C,1)])
+title('temp40(sorted by10)')
+
+
+[~, nind]=sort(dff2);
+C2=C2_old(nind,:);
+C=C_old(nind,:);
+
+crind={};
+[cmap]=cbrewer('div', 'RdBu', 256); %need to get cbrewer function
+cmap=flip(cmap);
+figure
+time=(1:new_end)/60/5; %frames/seconds/frame rate
+h=heatmap_d(C,time,[],[],'MaxColorValue',5,'MinColorValue',-5,'Colormap',cmap,'Colorbar',1);
+xticks([1:25]*60*5) %60*frame rate 
+xticklabels([1:25]*60)
+yticks([1:size(C,1)])
+yticklabels([1:size(C,1)])
+title('temp10(sorted by 40)')
+
+crind={};
+[cmap]=cbrewer('div', 'RdBu', 256); %need to get cbrewer function
+cmap=flip(cmap);
+figure
+time=(1:new_end)/60/5; %frames/seconds/frame rate
+h=heatmap_d(C2,time,[],[],'MaxColorValue',5,'MinColorValue',-5,'Colormap',cmap,'Colorbar',1);
+xticks([1:25]*60*75) %60*frame rate 
+xticklabels([1:25]*60)
+yticks([1:size(C,1)])
+yticklabels([1:size(C,1)])
+title('temp40')
+
+
+filterby=29; %running average
+ds=29; %only keep one point per this many frames
+[x,ny1,ndy1]=JG_downsample_v3(C,filterby,ds)
+figure
+fill([x;flipud(x)],[ny1-ndy1;flipud(ny1+ndy1)],[.2 .9 .9],'linestyle','none');
+hold on
+plot(ny1);
+%set(gca, 'YLim', [-2 1])
+title('Temperature ramp to 40C w or wout NaCl')
+xticks([1:25]*60*5/ds)
+xticklabels([1:25]*60)
+% yticks([-3 -2 -1 0 1 2 3 4 5 6])
+
+these=find(dff>1);
+act=C_old(these,:);
+filterby=29; %running average
+ds=29; %only keep one point per this many frames
+[x,ny1,ndy1]=JG_downsample_v3(act,filterby,ds)
+figure
+fill([x;flipud(x)],[ny1-ndy1;flipud(ny1+ndy1)],[.2 .9 .9],'linestyle','none');
+hold on
+plot(ny1);
+%set(gca, 'YLim', [-2 1])
+title('10C activated')
+xticks([1:25]*60*5/ds)
+xticklabels([1:25]*60)
+
+these=find(dff<-1);
+inhib=C_old(these,:);
+filterby=29; %running average
+ds=29; %only keep one point per this many frames
+[x,ny1,ndy1]=JG_downsample_v3(inhib,filterby,ds)
+figure
+fill([x;flipud(x)],[ny1-ndy1;flipud(ny1+ndy1)],[.2 .9 .9],'linestyle','none');
+hold on
+plot(ny1);
+%set(gca, 'YLim', [-2 1])
+title('10C inhibited')
+xticks([1:25]*60*5/ds)
+xticklabels([1:25]*60)
+
+these=find(dff<1 & dff>-1);
+nada=C_old(these,:);
+filterby=29; %running average
+ds=29; %only keep one point per this many frames
+[x,ny1,ndy1]=JG_downsample_v3(nada,filterby,ds)
+figure
+fill([x;flipud(x)],[ny1-ndy1;flipud(ny1+ndy1)],[.2 .9 .9],'linestyle','none');
+hold on
+plot(ny1);
+%set(gca, 'YLim', [-2 1])
+title('10C no change')
+xticks([1:25]*60*75/ds)
+xticklabels([1:25]*60)
+
+these=find(dff2>1);
+act2=C2_old(these,:);
+filterby=29; %running average
+ds=29; %only keep one point per this many frames
+[x,ny1,ndy1]=JG_downsample_v3(act2,filterby,ds)
+figure
+fill([x;flipud(x)],[ny1-ndy1;flipud(ny1+ndy1)],[.2 .9 .9],'linestyle','none');
+hold on
+plot(ny1);
+%set(gca, 'YLim', [-2 1])
+title('40C Activated')
+xticks([1:25]*60*5/ds)
+xticklabels([1:25]*60)
+
+these=find(dff2<-1);
+inhib2=C2_old(these,:);
+filterby=29; %running average
+ds=29; %only keep one point per this many frames
+[x,ny1,ndy1]=JG_downsample_v3(inhib2,filterby,ds)
+figure
+fill([x;flipud(x)],[ny1-ndy1;flipud(ny1+ndy1)],[.2 .9 .9],'linestyle','none');
+hold on
+plot(ny1);
+%set(gca, 'YLim', [-2 1])
+title('40C Inhibited')
+xticks([1:25]*60*5/ds)
+xticklabels([1:25]*60)
+
+these=find(dff2<1 & dff2>-1);
+nada2=C2_old(these,:);
+filterby=29; %running average
+ds=29; %only keep one point per this many frames
+[x,ny1,ndy1]=JG_downsample_v3(nada2,filterby,ds)
+figure
+fill([x;flipud(x)],[ny1-ndy1;flipud(ny1+ndy1)],[.2 .9 .9],'linestyle','none');
+hold on
+plot(ny1);
+%set(gca, 'YLim', [-2 1])
+title('40C no change')
+xticks([1:25]*60*5/ds)
+xticklabels([1:25]*60)
+
+
+
+figure
+labels = {'Activated','Inhibited','no response'};
+pie([size(act,1) size(inhib,1) size(nada,1)], labels)
+title('pie')
+
+
+figure
+labels = {'Activated','Inhibited','no response'};
+pie([size(act2,1) size(inhib2,1) size(nada2,1)], labels)
+title('pie2')
+
+% 
+% x = 1:3;
+% data = [mean(dff(find(dff>0.5))) mean(dff(find(dff<-0.5))) mean(dff(find(dff<.5 & dff>-.5)))]';
+% se = [std(dff(find(dff>0.5)))/sqrt(size(find(dff>0.5),1)) std(dff(find(dff<-0.5)))/sqrt(size(find(dff<-0.5),1)) std(dff(find(dff<.5 & dff>-.5)))/sqrt(size(find(dff<.5 & dff>-.5),1))];
+% 
+% errhigh = data'+se;
+% figure
+% bar(x,data)                
+% hold on
+% er = errorbar(x,data,errhigh);    
+% er.Color = [0 0 0];                            
+% er.LineStyle = 'none';  
+% hold off
+% title('bar')
+% 
+FolderName = cd;   % Your destination folder
+FigList = findobj(allchild(0), 'flat', 'Type', 'figure');
+for iFig = 1:length(FigList)
+  FigHandle = FigList(iFig);
+  set(0, 'CurrentFigure', FigHandle)
+  FigName=get(get(gca, 'Title'),'string');
+  FigName=regexprep(FigName, ' +', '_');
+  FigName=regexprep(FigName, ',+', '');
+%   savefig(strcat(FigName, '.fig'));
+%   saveas(gcf, FigName, 'pbm');
+  saveas(gcf, FigName, 'tif');
+end
