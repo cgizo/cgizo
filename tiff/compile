@@ -16,6 +16,6 @@ q = os.path.join(dirpath, search_criteria)
 tiff_lst = glob.glob(q)
 
 for tiff in tiff_lst:
-    tifffile.imsave('temp.tif', imgs, append=True)
+    tifffile.imsave('temp.tif', tiff, append=True)
     
     
