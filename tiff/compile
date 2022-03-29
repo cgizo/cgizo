@@ -1,0 +1,7 @@
+import imageio as iio
+from pathlib import Path
+
+images = list()
+for file in Path("D:\CG_VGATM1_HEATSTEPS_28032022-000").iterdir():
+    im = iio.imread(file)
+    images.append(im)
