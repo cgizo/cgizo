@@ -19,17 +19,3 @@ for tiff in tiff_lst:
     tifffile.imsave('temp.tif', imgs, append=True)
     
     
-    Append an image series to the existing TIFF file:
->>> data = numpy.random.randint(0, 255, (301, 219, 3), 'uint8')
->>> imwrite('temp.tif', data, photometric='rgb', append=True)
-
-
-img1.save(output.tif,save_all=True,append_images=[img1])
-img1 = Image.open(open("file1.tif", 'rb'))
-img2 = Image.open(open(“file2.tif", 'rb'))
-img1.seek(0)
-img1.save(output.tif,save_all=True,append_images=img1)
-
-import tifffile
-
-tifffile.imsave('myimages.tiff',imgs)
