@@ -1,0 +1,20 @@
+    
+import os
+import tifftools
+
+# File and folder paths
+dirpath = r"location of tiffs"
+out_fp = r"output"
+
+# Make search criteria for glob
+search_criteria = "*.tif"
+q = os.path.join(dirpath, search_criteria)
+
+# List tiffs
+tiff_lst = glob.glob(q)
+
+tiff_files_li=[]
+for tiff in tiff_lst():
+    tiff_files_li.append(tiff)
+
+tifftools.tiff_concat(tiff_files_li, "output.tiff", overwrite=True)
