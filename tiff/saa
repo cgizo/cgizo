@@ -1,19 +1,9 @@
     
 import os
 import tifftools
-import glob
-
-dirpath = r"C:\Users\cgizo\Desktop\New folder"
-out_fp = r"C:\Users\cgizo\Desktop\New folder"
-
-search_criteria = "*.tif"
-q = os.path.join(dirpath, search_criteria)
-
-
-tiff_lst = glob.glob(q)
-
 tiff_files_li=[]
-for tiff in tiff_lst():
-    tiff_files_li.append(tiff)
+for ti in os.listdir():
+    if '.tif' in ti:
+        tiff_files_li.append(ti)
 
 tifftools.tiff_concat(tiff_files_li, "output.tiff", overwrite=True)
