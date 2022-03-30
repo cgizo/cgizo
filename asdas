@@ -9,7 +9,7 @@ dirpath = r"D:\CG_VGATM1_HEATSTEPS_28032022-000"
 out_fp = r"D:\CG_VGATM1_HEATSTEPS_28032022-000"
 
 search_criteria = "*.tif"
-q = os.path.join.(dirpath, search_criteria)
+q = os.path.join(dirpath, search_criteria)
 
 tiff_lst = glob.glob(q)
 
