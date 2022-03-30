@@ -1,10 +1,11 @@
     
 import os
 import tifftools
+import glob
 
 # File and folder paths
-dirpath = r"location of tiffs"
-out_fp = r"output"
+dirpath = r"C:\Users\cgizo\Desktop\New folder"
+out_fp = r"C:\Users\cgizo\Desktop\New folder"
 
 # Make search criteria for glob
 search_criteria = "*.tif"
