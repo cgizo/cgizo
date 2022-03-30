@@ -1,0 +1,7 @@
+import os
+import tifftools
+os.chdir('C:\Users\cgizo\Desktop\New folder')
+tiff_files_li=[]
+for ti in os.listdir():
+  if ".tif" in ti:
+  tiff_files_li.append(ti)
