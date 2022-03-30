@@ -3,15 +3,13 @@ import os
 import tifftools
 import glob
 
-# File and folder paths
 dirpath = r"C:\Users\cgizo\Desktop\New folder"
 out_fp = r"C:\Users\cgizo\Desktop\New folder"
 
-# Make search criteria for glob
 search_criteria = "*.tif"
 q = os.path.join(dirpath, search_criteria)
 
-# List tiffs
+
 tiff_lst = glob.glob(q)
 
 tiff_files_li=[]
