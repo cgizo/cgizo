@@ -1,8 +1,0 @@
-r=readtable('heatrampfirstone.csv')
-temp=r{:,4};
-M=mean(temp(1:484)); % mean the numbers that are before a whole 1min
-temp((1:484),:)=[]; %delete the numbers that were used to mean
-
-n=3592; %average every n values
-g=arrayfun(@(i) mean(temp(i:i+n-1)),1:n:length(temp)-n+1)';
-T2=[M;g]; 
